@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>StudyAI — Teknik Informatika</title>
+<meta name="description" content="Asisten belajar AI khusus Teknik Informatika">
+<meta name="theme-color" content="#080810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StudyAI TI">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2300e5ff'/><text y='.9em' font-size='70' x='15'>🎓</text></svg>">
+<link rel="manifest" id="manifest-placeholder">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080810; --surface:#0e0e1a; --card:#13131f; --card2:#17172a;
+  --border:#252538; --accent:#00e5ff; --accent2:#7c3aed; --accent3:#f59e0b;
+  --green:#22c55e; --red:#ef4444; --text:#e8e8f4; --muted:#5a5a78; --muted2:#8888a8;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+.mobile-nav{padding-bottom:env(safe-area-inset-bottom,0px);}
+
+/* HEADER */
+header{position:relative;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:rgba(8,8,16,.95);backdrop-filter:blur(16px);flex-shrink:0;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#000;}
+.logo-text{font-size:17px;font-weight:800;letter-spacing:-.5px;}
+.logo-text span{color:var(--accent);}
+.sem-select{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:5px 10px;cursor:pointer;outline:none;}
+.sem-select:focus{border-color:var(--accent);}
+.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.hbtn{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--muted2);padding:6px 12px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.hbtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,.06);}
+.mode-badge{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:99px;padding:4px 10px;}
+.mode-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* LAYOUT */
+.main{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;}
+
+/* SIDEBAR */
+.sidebar{width:210px;border-right:1px solid var(--border);padding:14px 10px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex-shrink:0;background:rgba(14,14,26,.7);}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);}
+.sb-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 8px 4px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;cursor:pointer;transition:all .2s;font-size:12px;font-weight:600;color:var(--muted2);border:1px solid transparent;}
+.sb-item:hover{background:var(--card);color:var(--text);border-color:var(--border);}
+.sb-item.active{background:rgba(0,229,255,.08);color:var(--accent);border-color:rgba(0,229,255,.2);}
+.sb-item .ic{font-size:14px;width:18px;text-align:center;}
+.dl-badge{margin-left:auto;background:var(--red);color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;border-radius:99px;padding:1px 6px;}
+
+/* VIEWS */
+.view{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.view.active{display:flex;}
+
+/* CHAT */
+.messages{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;}
+.messages::-webkit-scrollbar{width:4px;}
+.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:16px;text-align:center;padding:24px 20px 20px;animation:fadeUp .5s ease;}
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:540px;width:100%;margin-top:4px;}
+.tip-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px 14px;text-align:left;transition:border-color .2s;}
+.tip-card:hover{border-color:rgba(0,229,255,.2);}
+.tip-icon{font-size:18px;margin-bottom:5px;}
+.tip-label{font-size:12px;font-weight:700;margin-bottom:3px;color:var(--text);}
+.tip-desc{font-size:11px;color:var(--muted2);line-height:1.45;}
+
+/* Header mobile hide */
+.hide-mobile{display:flex;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.welcome-icon{width:68px;height:68px;background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(124,58,237,.12));border:1px solid rgba(0,229,255,.2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;}
+.welcome h2{font-size:26px;font-weight:800;line-height:1.25;}
+.welcome h2 span{color:var(--accent);}
+.welcome p{color:var(--muted2);font-size:14px;max-width:400px;line-height:1.65;}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;max-width:540px;width:100%;}
+.qbtn{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px 14px;text-align:left;cursor:pointer;transition:all .2s;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;}
+.qbtn:hover{border-color:var(--accent);background:rgba(0,229,255,.04);transform:translateY(-1px);}
+.qbtn .ql{font-size:10px;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-bottom:3px;}
+.qbtn .qt{font-size:12px;font-weight:600;line-height:1.4;}
+
+.msg{display:flex;gap:10px;animation:fadeUp .3s ease;max-width:820px;}
+.msg.user{align-self:flex-end;flex-direction:row-reverse;}
+.msg.ai{align-self:flex-start;}
+.msg-av{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:3px;}
+.msg.user .msg-av{background:linear-gradient(135deg,var(--accent2),#a855f7);}
+.msg.ai .msg-av{background:linear-gradient(135deg,#081818,#080d20);border:1px solid rgba(0,229,255,.2);}
+.msg-bubble{padding:13px 17px;border-radius:14px;font-size:14px;line-height:1.75;max-width:660px;}
+.msg.user .msg-bubble{background:var(--card2);border:1px solid var(--border);border-top-right-radius:3px;}
+.msg.ai .msg-bubble{background:rgba(0,30,30,.6);border:1px solid rgba(0,229,255,.1);border-top-left-radius:3px;}
+.msg-bubble pre{position:relative;background:#060610;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:10px 0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;}
+.copy-btn{position:absolute;top:8px;right:8px;font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--card2);border:1px solid var(--border);border-radius:5px;color:var(--muted2);padding:3px 8px;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+.msg-bubble code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(0,229,255,.08);color:var(--accent);padding:2px 5px;border-radius:4px;}
+.msg-bubble pre code{background:none;color:#90d4a0;padding:0;}
+.msg-bubble strong{color:var(--accent);font-weight:700;}
+.msg-bubble h3{font-size:14px;font-weight:700;margin:12px 0 5px;color:var(--accent);}
+.msg-bubble ul,.msg-bubble ol{padding-left:18px;margin:6px 0;}
+.msg-bubble li{margin:3px 0;}
+.thinking{display:flex;align-items:center;gap:8px;padding:13px 17px;background:rgba(0,30,30,.6);border:1px solid rgba(0,229,255,.1);border-radius:14px;border-top-left-radius:3px;color:var(--muted2);font-size:13px;}
+.dots{display:flex;gap:4px;}
+.dots span{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:dot 1.2s infinite;}
+.dots span:nth-child(2){animation-delay:.2s;}
+.dots span:nth-child(3){animation-delay:.4s;}
+@keyframes dot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* INPUT */
+.input-area{padding:12px 18px 16px;border-top:1px solid var(--border);background:rgba(8,8,16,.95);backdrop-filter:blur(14px);flex-shrink:0;}
+.input-row{display:flex;gap:8px;align-items:flex-end;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:8px 10px 8px 14px;transition:border-color .2s;max-width:880px;margin:0 auto;}
+.input-row:focus-within{border-color:rgba(0,229,255,.35);box-shadow:0 0 0 3px rgba(0,229,255,.05);}
+.attach-btn{width:32px;height:32px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--muted2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;flex-shrink:0;}
+.attach-btn:hover{border-color:var(--accent);color:var(--accent);}
+.input-row textarea{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;resize:none;min-height:22px;max-height:150px;line-height:1.6;}
+.input-row textarea::placeholder{color:var(--muted);}
+.send-btn{width:34px;height:34px;border-radius:9px;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;color:#000;}
+.send-btn:hover{background:#2af0ff;transform:scale(1.05);}
+.send-btn:disabled{background:var(--border);cursor:not-allowed;transform:none;color:var(--muted);}
+.send-btn svg{width:16px;height:16px;}
+.input-meta{display:flex;align-items:center;justify-content:space-between;max-width:880px;margin:5px auto 0;}
+.input-hint{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);}
+.file-tag{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent3);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:3px 8px;}
+.file-tag .rm{cursor:pointer;color:var(--red);margin-left:4px;}
+
+/* DEADLINE */
+.view-header{padding:16px 22px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.view-title{font-size:18px;font-weight:800;}
+.view-title span{color:var(--accent);}
+.add-dl-btn{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--accent);border-radius:8px;padding:7px 14px;cursor:pointer;transition:all .2s;}
+.add-dl-btn:hover{background:rgba(0,229,255,.18);}
+.dl-body{flex:1;overflow-y:auto;padding:18px 22px;}
+.dl-body::-webkit-scrollbar{width:4px;}
+.dl-body::-webkit-scrollbar-thumb{background:var(--border);}
+.dl-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--muted2);text-align:center;}
+.dl-empty .em-icon{font-size:40px;}
+.dl-list{display:flex;flex-direction:column;gap:10px;}
+.dl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
+.dl-card.urgent{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04);}
+.dl-card.soon{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04);}
+.dl-card.done{opacity:.45;}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dl-dot.urgent{background:var(--red);box-shadow:0 0 8px var(--red);}
+.dl-dot.soon{background:var(--accent3);box-shadow:0 0 8px var(--accent3);}
+.dl-dot.ok{background:var(--green);}
+.dl-dot.done{background:var(--muted);}
+.dl-info{flex:1;}
+.dl-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.dl-meta{display:flex;gap:10px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);}
+.dl-subject{background:rgba(0,229,255,.08);color:var(--accent);border-radius:5px;padding:1px 7px;}
+.dl-days.urgent{color:var(--red);}
+.dl-days.soon{color:var(--accent3);}
+.dl-actions{display:flex;gap:6px;}
+.dl-chk,.dl-del{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;color:var(--muted2);}
+.dl-chk:hover{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.08);}
+.dl-del:hover{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.08);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:360px;max-width:90vw;animation:fadeUp .25s ease;}
+.modal h3{font-size:16px;font-weight:800;margin-bottom:16px;}
+.modal h3 span{color:var(--accent);}
+.form-group{margin-bottom:12px;}
+.form-group label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:5px;}
+.form-group input,.form-group select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;padding:9px 12px;outline:none;transition:border-color .2s;}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+.modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;}
+.btn-cancel{font-family:'JetBrains Mono',monospace;font-size:11px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted2);padding:8px 16px;cursor:pointer;transition:all .2s;}
+.btn-cancel:hover{border-color:var(--text);color:var(--text);}
+.btn-save{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--accent);border:none;border-radius:8px;color:#000;padding:8px 16px;cursor:pointer;font-weight:700;}
+.btn-save:hover{background:#2af0ff;}
+
+/* QUIZ */
+.quiz-body{flex:1;overflow-y:auto;padding:22px;}
+.quiz-body::-webkit-scrollbar{width:4px;}
+.quiz-body::-webkit-scrollbar-thumb{background:var(--border);}
+.quiz-setup{display:flex;flex-direction:column;align-items:center;gap:18px;max-width:480px;margin:0 auto;padding-top:10px;}
+.quiz-setup h3{font-size:20px;font-weight:800;}
+.quiz-setup h3 span{color:var(--accent);}
+.quiz-setup p{color:var(--muted2);font-size:14px;text-align:center;line-height:1.6;}
+.quiz-topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;}
+.qo-btn{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:13px 14px;cursor:pointer;transition:all .2s;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;text-align:center;}
+.qo-btn:hover,.qo-btn.selected{border-color:var(--accent);background:rgba(0,229,255,.08);color:var(--accent);}
+.qo-icon{font-size:22px;margin-bottom:5px;}
+.qo-label{font-size:12px;font-weight:700;}
+.qnum-row{display:flex;gap:8px;width:100%;}
+.qnum-btn{flex:1;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px;cursor:pointer;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;transition:all .2s;text-align:center;}
+.qnum-btn:hover,.qnum-btn.selected{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,.08);}
+.quiz-custom-wrap{position:relative;width:100%;}
+.quiz-custom-input{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13px;padding:10px 36px 10px 14px;outline:none;
+  transition:border-color .2s;
+}
+.quiz-custom-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,.06);}
+.quiz-custom-input::placeholder{color:var(--muted);}
+.quiz-custom-input.has-value{border-color:var(--accent);background:rgba(0,229,255,.04);}
+.quiz-custom-clear{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--muted2);cursor:pointer;
+  font-size:14px;padding:4px;transition:color .2s;
+}
+.quiz-custom-clear:hover{color:var(--red);}
+
+.start-quiz-btn{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--accent);border:none;border-radius:10px;color:#000;padding:12px 28px;cursor:pointer;transition:all .2s;font-weight:700;width:100%;}
+.start-quiz-btn:hover{background:#2af0ff;}
+.start-quiz-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+
+.quiz-loading{display:none;flex-direction:column;align-items:center;gap:14px;padding-top:60px;color:var(--muted2);font-size:14px;}
+.quiz-running{display:none;flex-direction:column;gap:18px;max-width:600px;margin:0 auto;}
+.quiz-running.on{display:flex;}
+.quiz-top{display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);}
+.q-score-live{color:var(--green);}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;}
+.quiz-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:1px;margin-bottom:8px;}
+.q-text{font-size:15px;font-weight:700;line-height:1.5;margin-bottom:16px;}
+.q-choices{display:flex;flex-direction:column;gap:8px;}
+.q-choice{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 15px;cursor:pointer;transition:all .2s;font-size:14px;text-align:left;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:12px;}
+.q-choice:hover:not(:disabled){border-color:var(--accent);background:rgba(0,229,255,.06);}
+.q-choice.correct{border-color:var(--green);background:rgba(34,197,94,.1);color:var(--green);}
+.q-choice.wrong{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red);}
+.q-choice:disabled{cursor:default;}
+.ch-letter{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;flex-shrink:0;}
+.q-explanation{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:10px;padding:13px 15px;font-size:13px;line-height:1.65;color:var(--muted2);display:none;}
+.q-explanation.show{display:block;}
+.q-explanation strong{color:var(--accent);}
+.next-btn{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--accent);border:none;border-radius:10px;color:#000;padding:10px 22px;cursor:pointer;transition:all .2s;font-weight:700;align-self:flex-end;display:none;}
+.next-btn.show{display:block;}
+.next-btn:hover{background:#2af0ff;}
+
+.quiz-result{display:none;flex-direction:column;align-items:center;gap:16px;text-align:center;padding-top:20px;}
+.quiz-result.on{display:flex;}
+.result-ring{width:110px;height:110px;border-radius:50%;background:conic-gradient(var(--accent) var(--pct,0%),var(--border) 0);display:flex;align-items:center;justify-content:center;position:relative;}
+.result-ring::after{content:'';position:absolute;inset:10px;background:var(--bg);border-radius:50%;}
+.result-score{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;}
+.result-label{font-size:20px;font-weight:800;}
+.result-label span{color:var(--accent);}
+.result-sub{font-size:13px;color:var(--muted2);}
+.retry-btn{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:9px 20px;cursor:pointer;transition:all .2s;}
+.retry-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* API KEY SCREEN */
+.apikey-screen{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;}
+.apikey-screen::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+.apikey-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:20px;animation:fadeUp .4s ease;position:relative;z-index:1;}
+.apikey-logo{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.apikey-logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#000;}
+.apikey-logo-text{font-size:22px;font-weight:800;}
+.apikey-logo-text span{color:var(--accent);}
+.apikey-desc{font-size:14px;color:var(--muted2);line-height:1.65;}
+.apikey-desc a{color:var(--accent);text-decoration:none;}
+.apikey-desc a:hover{text-decoration:underline;}
+.apikey-input-wrap{position:relative;}
+.apikey-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;padding:12px 44px 12px 14px;outline:none;transition:border-color .2s;letter-spacing:.5px;}
+.apikey-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,.06);}
+.apikey-input::placeholder{color:var(--muted);letter-spacing:0;}
+.apikey-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted2);cursor:pointer;font-size:16px;}
+.apikey-save-btn{background:var(--accent);border:none;border-radius:10px;color:#000;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:13px;cursor:pointer;transition:all .2s;width:100%;}
+.apikey-save-btn:hover{background:#2af0ff;}
+.apikey-save-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.apikey-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;line-height:1.6;}
+.apikey-steps{display:flex;flex-direction:column;gap:8px;}
+.apikey-step{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted2);}
+.step-num{width:22px;height:22px;border-radius:6px;background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.2);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+/* KEY INDICATOR IN HEADER */
+.key-indicator{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:99px;padding:4px 10px;cursor:pointer;transition:all .2s;}
+.key-indicator:hover{background:rgba(34,197,94,.15);}
+.key-dot{width:6px;height:6px;background:var(--green);border-radius:50%;}
+
+/* Mobile bottom nav */
+.mobile-nav{
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:50;
+  background:rgba(8,8,16,.97); backdrop-filter:blur(16px);
+  border-top:1px solid var(--border); height:54px; align-items:stretch;
+}
+.mnav-item{
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:2px; cursor:pointer; transition:all .2s;
+  color:var(--muted2); border:none; background:none;
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:9px; font-weight:600;
+  padding:6px 4px; position:relative;
+}
+.mnav-item:hover,.mnav-item.active{color:var(--accent);}
+.mnav-item.active::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--accent);border-radius:0 0 2px 2px;}
+.mnav-icon{font-size:16px;line-height:1;}
+.mnav-dl-badge{position:absolute;top:4px;right:calc(50% - 16px);background:var(--red);color:#fff;font-family:'JetBrains Mono',monospace;font-size:8px;border-radius:99px;padding:1px 4px;min-width:13px;text-align:center;}
+
+/* Floating mode menu */
+.mode-drawer-overlay{display:none;}
+.mode-drawer{
+  display:none; position:fixed; bottom:58px; left:8px; right:8px; z-index:70;
+  background:rgba(13,13,22,.99); border:1px solid var(--border);
+  border-radius:14px; padding:10px 10px 8px;
+  box-shadow:0 -4px 24px rgba(0,0,0,.6);
+}
+.mode-drawer.open{display:block;}
+.drawer-handle{display:none;}
+.drawer-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;padding:0 2px;}
+.drawer-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.drawer-btn{
+  background:var(--card); border:1px solid var(--border); border-radius:99px;
+  padding:5px 12px; cursor:pointer; color:var(--muted2);
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:11px; font-weight:700;
+  transition:all .15s; display:flex; align-items:center; gap:5px; white-space:nowrap;
+}
+.drawer-btn:active,.drawer-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,.1);}
+.drawer-matkul-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;padding:0 2px;}
+.drawer-matkul{display:flex;flex-wrap:wrap;gap:5px;max-height:80px;overflow-y:auto;}
+.drawer-matkul-pill{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:99px;padding:4px 9px;cursor:pointer;
+  color:var(--muted2);transition:all .15s;white-space:nowrap;
+}
+.drawer-matkul-pill:active,.drawer-matkul-pill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,.1);}
+
+@media(max-width:640px){
+  body{font-size:14px;}
+  .sidebar{display:none;}
+  .mobile-nav{display:flex;}
+  .main{padding-bottom:54px;}
+  .input-area{padding-bottom:62px;padding-top:8px;padding-left:10px;padding-right:10px;}
+
+  /* Header - compact, no overflow */
+  header{padding:7px 10px;gap:5px;}
+  .logo-text{font-size:14px;letter-spacing:-.3px;}
+  .logo-icon{width:26px;height:26px;font-size:10px;border-radius:6px;}
+  .sem-select{font-size:10px;padding:4px 7px;max-width:120px;}
+  .hbtn{font-size:10px;padding:5px 7px;gap:3px;}
+  .hbtn-text{display:none;}
+  .key-indicator{font-size:10px;padding:4px 8px;gap:4px;}
+  .hide-mobile{display:none!important;}
+
+  /* View header */
+  .view-header{padding:10px 14px 8px;}
+  .view-title{font-size:15px;}
+  .add-dl-btn{font-size:11px;padding:6px 12px;}
+
+  /* Quiz setup */
+  .quiz-body{padding:12px 14px;}
+  .quiz-setup{gap:10px;padding-top:4px;}
+  .quiz-setup h3{font-size:17px;font-weight:800;}
+  .quiz-setup p{font-size:12px;line-height:1.55;color:var(--muted2);}
+  .quiz-topic-grid{grid-template-columns:1fr 1fr;gap:6px;}
+  .qo-btn{padding:10px 6px;border-radius:10px;font-weight:600;}
+  .qo-icon{font-size:20px;margin-bottom:4px;}
+  .qo-label{font-size:11px;font-weight:600;letter-spacing:-.2px;}
+  .qnum-btn{padding:8px;font-size:11px;font-weight:600;}
+  .start-quiz-btn{padding:11px;font-size:12px;border-radius:10px;}
+
+  /* Quiz running */
+  .quiz-card{padding:14px;}
+  .q-num{font-size:10px;}
+  .q-text{font-size:13.5px;line-height:1.5;margin-bottom:12px;}
+  .q-choice{padding:9px 12px;font-size:13px;gap:10px;line-height:1.4;}
+  .ch-letter{width:22px;height:22px;font-size:11px;border-radius:6px;}
+  .q-explanation{padding:10px 12px;font-size:12.5px;line-height:1.6;}
+
+  /* Messages */
+  .messages{padding:12px 14px;gap:10px;}
+  .msg-bubble{padding:10px 13px;font-size:13.5px;line-height:1.7;}
+  .msg-av{width:28px;height:28px;font-size:13px;border-radius:8px;}
+  .msg-bubble code{font-size:11.5px;}
+  .msg-bubble pre{font-size:11.5px;padding:10px 12px;}
+
+  /* Welcome - compact & filled */
+  .welcome{padding:14px 12px 12px;gap:11px;}
+  .welcome-icon{width:46px;height:46px;font-size:20px;border-radius:12px;}
+  .welcome h2{font-size:18px;font-weight:800;}
+  .welcome p{font-size:12px;line-height:1.5;max-width:100%;}
+  .quick-grid{grid-template-columns:1fr 1fr;gap:6px;}
+  .qbtn{padding:9px 10px;border-radius:10px;}
+  .qbtn .ql{font-size:9px;margin-bottom:2px;letter-spacing:.5px;}
+  .qbtn .qt{font-size:11.5px;line-height:1.35;}
+  .tips-grid{grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;}
+  .tip-card{padding:9px 10px;border-radius:9px;}
+  .tip-icon{font-size:15px;margin-bottom:3px;}
+  .tip-label{font-size:11px;margin-bottom:2px;}
+  .tip-desc{font-size:10px;line-height:1.4;}
+
+  /* Input */
+  .input-row{padding:6px 8px 6px 12px;border-radius:12px;}
+  .input-row textarea{font-size:14px;min-height:22px;line-height:1.5;}
+  .send-btn{width:30px;height:30px;border-radius:8px;}
+  .attach-btn{width:28px;height:28px;font-size:14px;}
+  .input-hint{font-size:10px;}
+
+  /* Deadline */
+  .dl-body{padding:10px 14px;}
+  .dl-card{padding:11px 13px;gap:10px;border-radius:11px;}
+  .dl-name{font-size:13px;margin-bottom:3px;}
+  .dl-meta{font-size:10px;gap:7px;}
+  .dl-subject{font-size:10px;}
+  .dl-chk,.dl-del{width:26px;height:26px;font-size:12px;border-radius:7px;}
+  .dl-dot{width:9px;height:9px;}
+
+  /* Floating mode menu */
+  .drawer-btn{font-size:12px;padding:6px 13px;font-weight:600;}
+  .drawer-matkul-pill{font-size:10px;padding:5px 11px;}
+  .drawer-title,.drawer-matkul-label{font-size:9.5px;letter-spacing:1.5px;}
+}
+</style>
+</head>
+<body>
+
+<!-- API KEY SCREEN -->
+<div class="apikey-screen" id="apikeyScreen">
+  <div class="apikey-box">
+    <div class="apikey-logo">
+      <div class="apikey-logo-icon">TI</div>
+      <div class="apikey-logo-text">Study<span>AI</span></div>
+    </div>
+    <div class="apikey-desc">
+      Selamat datang! StudyAI menggunakan <strong>Groq API</strong> yang <strong>gratis</strong> dan sangat cepat.<br><br>
+      Daftar sekali, masukkan key sekali — tersimpan permanen di browser/HP kamu.
+    </div>
+    <div class="apikey-steps">
+      <div class="apikey-step"><div class="step-num">1</div><span>Buka <a href="https://console.groq.com" target="_blank">console.groq.com</a> → daftar akun gratis (bisa pakai Google)</span></div>
+      <div class="apikey-step"><div class="step-num">2</div><span>Klik menu <strong>API Keys</strong> → klik <strong>Create API Key</strong></span></div>
+      <div class="apikey-step"><div class="step-num">3</div><span>Salin key yang muncul dan tempel di bawah ini</span></div>
+    </div>
+    <div class="apikey-input-wrap">
+      <input class="apikey-input" type="password" id="apikeyInput" placeholder="gsk_..." oninput="checkKey()" onkeyup="checkKey()" onpaste="setTimeout(checkKey,50)">
+      <button class="apikey-toggle" onclick="toggleKeyVis()" id="keyToggle">👁</button>
+    </div>
+    <button class="apikey-save-btn" id="apikeySaveBtn" onclick="saveApiKey()">Simpan & Mulai →</button>
+    <div class="apikey-note">🔒 API key disimpan hanya di browser/HP kamu · Tidak dikirim ke mana pun selain Groq</div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">TI</div>
+    <div class="logo-text">Study<span>AI</span></div>
+  </div>
+  <select class="sem-select" id="semSelect" onchange="changeSemester()">
+    <option value="">Semua Semester</option>
+    <option value="1">Semester 1</option>
+    <option value="2">Semester 2</option>
+    <option value="3">Semester 3</option>
+    <option value="4">Semester 4</option>
+    <option value="5">Semester 5</option>
+    <option value="6">Semester 6</option>
+    <option value="7">Semester 7</option>
+    <option value="8">Semester 8</option>
+  </select>
+  <div class="header-right">
+    <button class="hbtn" onclick="clearChat()"><span class="hbtn-icon">🗑</span><span class="hbtn-text"> Hapus Chat</span></button>
+    <div class="key-indicator" onclick="changeApiKey()" title="Ganti API Key">
+      <div class="key-dot"></div><span class="hbtn-text">Key Aktif</span>
+    </div>
+    <div class="mode-badge hide-mobile"><div class="mode-dot"></div>Online</div>
+  </div>
+</header>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-label">Mode Belajar</div>
+    <div class="sb-item active" id="sb-tanya" onclick="setMode(this,'tanya')"><span class="ic">💬</span> Tanya Jawab</div>
+    <div class="sb-item" id="sb-latihan" onclick="setMode(this,'latihan')"><span class="ic">📝</span> Latihan Soal</div>
+    <div class="sb-item" id="sb-debug" onclick="setMode(this,'debug')"><span class="ic">🐛</span> Debug Kode</div>
+    <div class="sb-item" id="sb-rangkum" onclick="setMode(this,'rangkum')"><span class="ic">📖</span> Rangkum Materi</div>
+    <div class="sb-item" id="sb-ide" onclick="setMode(this,'ide')"><span class="ic">💡</span> Ide & Diskusi</div>
+    <div class="sb-item" id="sb-quiz" onclick="switchView('quiz')"><span class="ic">🎯</span> Kuis Interaktif</div>
+    <div class="sb-item" id="sb-deadline" onclick="switchView('deadline')">
+      <span class="ic">📅</span> Deadline
+      <span class="dl-badge" id="dlBadge" style="display:none">0</span>
+    </div>
+    <div class="sb-label" style="margin-top:8px">Mata Kuliah</div>
+    <div id="matkul-list"></div>
+  </div>
+
+  <!-- CHAT VIEW -->
+  <div class="view active" id="view-chat">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">🎓</div>
+        <h2>Halo! Saya <span>StudyAI</span></h2>
+        <p>Asisten belajar khusus Teknik Informatika. Pilih semester & mata kuliah di sidebar, atau langsung tanyakan apa saja!</p>
+        <div class="quick-grid" id="quickGrid"></div>
+        <div class="tips-grid">
+          <div class="tip-card">
+            <div class="tip-icon">🐛</div>
+            <div class="tip-label">Debug Kode</div>
+            <div class="tip-desc">Paste kode error, langsung dicari bugnya</div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon">📎</div>
+            <div class="tip-label">Upload File</div>
+            <div class="tip-desc">Lampirkan PDF atau gambar modul kuliah</div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon">🎯</div>
+            <div class="tip-label">Kuis Interaktif</div>
+            <div class="tip-desc">Generate soal pilihan ganda otomatis</div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon">📅</div>
+            <div class="tip-label">Deadline Tracker</div>
+            <div class="tip-desc">Catat & pantau semua deadline tugas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <button class="attach-btn" title="Lampirkan file" onclick="document.getElementById('fileIn').click()">📎</button>
+        <input type="file" id="fileIn" style="display:none" accept=".txt,.pdf,.png,.jpg,.jpeg" onchange="handleFile(this)">
+        <textarea id="userInput" placeholder="Tanya materi, paste kode untuk di-debug, atau lampirkan file..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-meta">
+        <span class="input-hint">Enter kirim · Shift+Enter baris baru</span>
+        <div class="file-tag" id="fileTag" style="display:none">
+          📄 <span id="fileName"></span><span class="rm" onclick="removeFile()">✕</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEADLINE VIEW -->
+  <div class="view" id="view-deadline">
+    <div class="view-header">
+      <div class="view-title">📅 <span>Deadline</span> Tracker</div>
+      <button class="add-dl-btn" onclick="openModal()">+ Tambah Deadline</button>
+    </div>
+    <div class="dl-body" id="dlBody">
+      <div class="dl-empty"><div class="em-icon">🗓️</div><p>Belum ada deadline.<br>Tambahkan agar tidak terlewat!</p></div>
+    </div>
+  </div>
+
+  <!-- QUIZ VIEW -->
+  <div class="view" id="view-quiz">
+    <div class="view-header">
+      <div class="view-title">🎯 Kuis <span>Interaktif</span></div>
+    </div>
+    <div class="quiz-body">
+      <div class="quiz-setup" id="quizSetup">
+        <h3>Pilih <span>Topik</span> Kuis</h3>
+        <p>AI akan generate soal pilihan ganda otomatis. Pilih topik atau ketik mata kuliah sendiri!</p>
+        <div class="quiz-topic-grid" id="quizTopics"></div>
+
+        <!-- Custom subject input -->
+        <div style="width:100%">
+          <div class="sb-label" style="padding:0 0 6px">✏️ ATAU KETIK MATA KULIAH SENDIRI</div>
+          <div class="quiz-custom-wrap">
+            <input type="text" id="quizCustomInput" class="quiz-custom-input"
+              placeholder="Contoh: Pemrograman Mobile, Statistika, Kalkulus..."
+              oninput="handleCustomTopic(this.value)"
+              onkeydown="if(event.key==='Enter') handleCustomTopic(this.value,true)">
+            <button class="quiz-custom-clear" id="quizCustomClear" onclick="clearCustomTopic()" style="display:none">✕</button>
+          </div>
+        </div>
+
+        <div style="width:100%">
+          <div class="sb-label" style="padding:0 0 6px">Jumlah Soal</div>
+          <div class="qnum-row">
+            <button class="qnum-btn selected" id="qn5" onclick="pickNum(5,this)">5 Soal</button>
+            <button class="qnum-btn" id="qn10" onclick="pickNum(10,this)">10 Soal</button>
+          </div>
+        </div>
+        <button class="start-quiz-btn" id="startBtn" onclick="startQuiz()" disabled>Mulai Kuis →</button>
+      </div>
+
+      <div class="quiz-loading" id="quizLoading">
+        <div class="dots" style="transform:scale(1.4)"><span></span><span></span><span></span></div>
+        <div>Membuat soal kuis, sebentar ya...</div>
+      </div>
+
+      <div class="quiz-running" id="quizRunning">
+        <div class="quiz-top">
+          <span id="qProg">Soal 1 / 5</span>
+          <span class="q-score-live" id="qScoreLive">Skor: 0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="qFill" style="width:0%"></div></div>
+        <div class="quiz-card">
+          <div class="q-num" id="qNum">SOAL 01</div>
+          <div class="q-text" id="qText"></div>
+          <div class="q-choices" id="qChoices"></div>
+        </div>
+        <div class="q-explanation" id="qExp"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQ()">Soal Berikutnya →</button>
+      </div>
+
+      <div class="quiz-result" id="quizResult">
+        <div class="result-ring" id="resultRing"><div class="result-score" id="resultScore">0/0</div></div>
+        <div class="result-label">Kuis <span>Selesai!</span></div>
+        <div class="result-sub" id="resultSub"></div>
+        <button class="retry-btn" onclick="resetQuiz()">↺ Ulangi Kuis</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Tambah <span>Deadline</span></h3>
+    <div class="form-group"><label>Nama Tugas</label><input type="text" id="dlName" placeholder="Misal: Laporan Praktikum 3"></div>
+    <div class="form-group"><label>Mata Kuliah</label><input type="text" id="dlSubject" placeholder="Misal: Basis Data"></div>
+    <div class="form-group"><label>Tanggal Deadline</label><input type="date" id="dlDate"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Batal</button>
+      <button class="btn-save" onclick="saveDeadline()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───
+const SEMESTERS = {
+  '':['Semua Mata Kuliah'],
+  '1':['Matematika Dasar','Fisika','Pengantar TI','Algoritma Pemrograman','Bahasa Indonesia'],
+  '2':['Matematika Diskrit','Kalkulus','OOP','Struktur Data','Statistika'],
+  '3':['Basis Data','Jaringan Komputer','Pemrograman Web','Analisis Algoritma','Sistem Digital'],
+  '4':['Sistem Operasi','Rekayasa Perangkat Lunak','Teori Bahasa Otomata','Pemrograman Mobile','Grafika Komputer'],
+  '5':['Kecerdasan Buatan','Data Mining','Keamanan Jaringan','Arsitektur Komputer','Interaksi Manusia Komputer'],
+  '6':['Machine Learning','Cloud Computing','Sistem Terdistribusi','Pengolahan Citra','Metodologi Penelitian'],
+  '7':['Skripsi / TA','Magang','Mata Kuliah Pilihan 1','Mata Kuliah Pilihan 2'],
+  '8':['Skripsi / TA Lanjut','Seminar Hasil','Ujian Akhir'],
+};
+
+const QUIZ_TOPICS = [
+  {icon:'⚙️',label:'Algoritma & Kompleksitas'},
+  {icon:'🧩',label:'Struktur Data'},
+  {icon:'🗄️',label:'Basis Data & SQL'},
+  {icon:'🔌',label:'Jaringan Komputer'},
+  {icon:'💻',label:'Sistem Operasi'},
+  {icon:'🌐',label:'Pemrograman Web'},
+  {icon:'🤖',label:'Kecerdasan Buatan'},
+  {icon:'🔒',label:'Keamanan Komputer'},
+];
+
+const MODE_PROMPTS = {
+  tanya:'Kamu adalah asisten belajar cerdas untuk mahasiswa Teknik Informatika. Berikan penjelasan yang jelas, terstruktur, dengan contoh nyata dan analogi yang mudah dipahami.',
+  latihan:'Kamu adalah tutor Teknik Informatika. Mode: LATIHAN SOAL. Buatkan soal dengan tingkat kesulitan bertahap. Setelah user menjawab, berikan evaluasi dan pembahasan lengkap.',
+  debug:'Kamu adalah expert programmer dan debugger. Analisis kode yang diberikan, temukan semua bug, jelaskan penyebabnya, dan berikan kode yang sudah diperbaiki.',
+  rangkum:'Kamu adalah asisten akademik. Buat ringkasan terstruktur dengan poin-poin kunci, konsep penting, dan rumus/definisi yang perlu diingat.',
+  ide:'Kamu adalah asisten brainstorming akademik. Bantu generate ide, sudut pandang, dan argumen kuat untuk diskusi dan tugas mahasiswa.',
+};
+
+// ─── STATE ───
+let mode = 'tanya', subject = '', isLoading = false;
+let history = [], attachedFile = {}, deadlines = [];
+let quizTopic = '', quizNum = 5, quizQs = [], quizIdx = 0, quizScore = 0, quizAnswered = false;
+let API_KEY = '';
+
+// ─── INIT ───
+function init() {
+// Load API key
+  API_KEY = localStorage.getItem('studyai_groqkey') || '';
+  // Jika dibuka di dalam Claude (tidak perlu API key), sembunyikan setup screen
+  const insideClaude = window.location.hostname === '' || window.location.protocol === 'blob:' || document.referrer.includes('claude.ai') || window.parent !== window;
+  if(API_KEY || insideClaude) {
+    document.getElementById('apikeyScreen').style.display = 'none';
+  }
+  // Load deadlines from localStorage
+  try { deadlines = JSON.parse(localStorage.getItem('studyai_deadlines') || '[]'); } catch(e){ deadlines=[]; }
+  renderDeadlines(); updateBadge();
+  renderMatkul('');
+  renderQuizTopics();
+  renderQuickPrompts();
+  document.getElementById('dlDate').valueAsDate = new Date();
+}
+
+// ─── API KEY MANAGEMENT ───
+function checkKey(){
+  const v=document.getElementById('apikeyInput').value.trim();
+  document.getElementById('apikeySaveBtn').disabled = v.length < 10;
+}
+function toggleKeyVis(){
+  const inp=document.getElementById('apikeyInput');
+  const btn=document.getElementById('keyToggle');
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
+}
+function saveApiKey(){
+  const key=document.getElementById('apikeyInput').value.trim();
+  if(!key || key.length < 10) { alert('Masukkan API key yang valid!'); return; }
+  API_KEY=key;
+  localStorage.setItem('studyai_groqkey', key);
+  document.getElementById('apikeyScreen').style.display='none';
+}
+function changeApiKey(){
+  if(!confirm('Ganti API Key? Kamu perlu memasukkan key baru.')) return;
+  document.getElementById('apikeyInput').value='';
+  document.getElementById('apikeySaveBtn').disabled=true;
+  document.getElementById('apikeyScreen').style.display='flex';
+}
+
+// ─── QUICK PROMPTS POOL ───
+const PROMPT_POOL = [
+  {label:'⚙️ ALGORITMA', text:'Jelaskan Big O Notation dengan analogi sederhana dan contoh kode Python', q:'Jelaskan Big O Notation + contoh kode'},
+  {label:'🔌 JARINGAN', text:'Apa perbedaan TCP dan UDP? Kapan kita harus pakai masing-masing?', q:'TCP vs UDP — perbedaan & penggunaan'},
+  {label:'🗄️ BASIS DATA', text:'Buatkan soal latihan SQL JOIN 3 tingkat kesulitan beserta pembahasannya', q:'Soal SQL JOIN + pembahasan lengkap'},
+  {label:'💻 SISTEM OPERASI', text:'Jelaskan perbedaan deadlock, starvation, dan race condition di Sistem Operasi', q:'Deadlock vs Starvation vs Race Condition'},
+  {label:'🧩 STRUKTUR DATA', text:'Kapan sebaiknya menggunakan Stack vs Queue? Berikan contoh kasus nyata', q:'Stack vs Queue — kapan digunakan?'},
+  {label:'🌐 PEMROG. WEB', text:'Jelaskan perbedaan GET dan POST dalam HTTP beserta contoh penggunaannya', q:'GET vs POST — perbedaan & contoh'},
+  {label:'🤖 KECERDASAN BUATAN', text:'Jelaskan perbedaan supervised, unsupervised, dan reinforcement learning dengan contoh sederhana', q:'Supervised vs Unsupervised vs RL'},
+  {label:'⚙️ ALGORITMA', text:'Jelaskan bagaimana algoritma sorting Merge Sort bekerja langkah demi langkah', q:'Cara kerja Merge Sort step-by-step'},
+  {label:'🔒 KEAMANAN', text:'Apa itu SQL Injection dan bagaimana cara mencegahnya? Berikan contoh kode', q:'SQL Injection — cara kerja & pencegahan'},
+  {label:'🗄️ BASIS DATA', text:'Apa perbedaan SQL dan NoSQL? Kapan sebaiknya menggunakan masing-masing?', q:'SQL vs NoSQL — kapan digunakan?'},
+  {label:'💻 SISTEM OPERASI', text:'Jelaskan apa itu virtual memory dan bagaimana cara kerjanya', q:'Virtual Memory — konsep & cara kerja'},
+  {label:'🌐 PEMROG. WEB', text:'Jelaskan konsep RESTful API beserta contoh endpoint yang baik', q:'RESTful API — konsep & contoh'},
+  {label:'🧩 STRUKTUR DATA', text:'Jelaskan bagaimana Binary Search Tree bekerja dan operasi dasar yang bisa dilakukan', q:'Binary Search Tree — operasi dasar'},
+  {label:'🤖 KECERDASAN BUATAN', text:'Jelaskan apa itu neural network dengan analogi yang mudah dipahami', q:'Neural Network — penjelasan sederhana'},
+  {label:'🔌 JARINGAN', text:'Apa itu OSI model? Jelaskan setiap layer dengan fungsi dan contohnya', q:'OSI Model — 7 layer & fungsinya'},
+  {label:'⚙️ ALGORITMA', text:'Jelaskan perbedaan rekursi dan iterasi, kapan sebaiknya menggunakan masing-masing?', q:'Rekursi vs Iterasi — perbedaan & kapan dipakai'},
+  {label:'📐 RPL', text:'Apa itu design pattern? Jelaskan pola Singleton, Factory, dan Observer dengan contoh', q:'Design Pattern — Singleton, Factory, Observer'},
+  {label:'∑ MAT. DISKRIT', text:'Jelaskan konsep graf dalam matematika diskrit dan jenis-jenisnya beserta contoh', q:'Graf dalam Matematika Diskrit'},
+  {label:'🌐 PEMROG. WEB', text:'Apa perbedaan antara cookies, localStorage, dan sessionStorage di browser?', q:'Cookies vs localStorage vs sessionStorage'},
+  {label:'🔒 KEAMANAN', text:'Jelaskan apa itu enkripsi simetris vs asimetris dengan contoh algoritma yang digunakan', q:'Enkripsi Simetris vs Asimetris'},
+];
+
+function renderQuickPrompts() {
+  const pool = [...PROMPT_POOL];
+  // Shuffle array
+  for(let i = pool.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const selected = pool.slice(0, 4);
+  document.getElementById('quickGrid').innerHTML = selected.map(p =>
+    `<button class="qbtn" onclick="sendQuick('${p.text.replace(/'/g,"\\'")}')">
+      <div class="ql">${p.label}</div>
+      <div class="qt">${p.q}</div>
+    </button>`
+  ).join('');
+}
+
+// ─── SEMESTER ───
+function changeSemester() {
+  renderMatkul(document.getElementById('semSelect').value);
+}
+function renderMatkul(sem) {
+  const list = document.getElementById('matkul-list');
+  list.innerHTML = (SEMESTERS[sem]||SEMESTERS['']).map(c =>
+    `<div class="sb-item" onclick="pickSubject(this,'${c}')"><span class="ic">📚</span>${c}</div>`
+  ).join('');
+}
+
+// ─── VIEW ───
+function switchView(v, skipSidebar) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if(!skipSidebar) {
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+    const map = {chat:'sb-tanya', deadline:'sb-deadline', quiz:'sb-quiz'};
+    if(map[v]) document.getElementById(map[v])?.classList.add('active');
+  }
+}
+
+// ─── CHAT MODE ───
+function setMode(el, m) {
+  mode = m;
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  switchView('chat', true); // skip sidebar reset
+
+  // Update placeholder sesuai mode
+  const placeholders = {
+    tanya: 'Tanya apa saja tentang materi kuliah...',
+    latihan: 'Minta soal latihan, misal: "Buatkan 5 soal tentang rekursi"...',
+    debug: 'Paste kode yang error di sini untuk di-debug...',
+    rangkum: 'Paste materi atau teks yang ingin dirangkum...',
+    ide: 'Ceritakan topik diskusi atau tugasmu, saya bantu brainstorm...',
+  };
+  document.getElementById('userInput').placeholder = placeholders[m] || 'Ketik pesan...';
+  document.getElementById('userInput').focus();
+
+  // Update mode badge di header
+  const labels = {tanya:'💬 Tanya Jawab', latihan:'📝 Latihan Soal', debug:'🐛 Debug Kode', rangkum:'📖 Rangkum Materi', ide:'💡 Ide & Diskusi'};
+  document.querySelector('.mode-badge').innerHTML = `<div class="mode-dot"></div>${labels[m] || 'Tanya Jawab'}`;
+}
+function pickSubject(el, s) {
+  subject = s;
+  document.querySelectorAll('#matkul-list .sb-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('userInput').placeholder = `Tanya tentang ${s}...`;
+  document.getElementById('userInput').focus();
+  switchView('chat', true);
+}
+function getSystemPrompt() {
+  let p = MODE_PROMPTS[mode] || MODE_PROMPTS.tanya;
+  if(subject) p += ` Konteks mata kuliah: ${subject}.`;
+  p += ' Jawab dalam Bahasa Indonesia yang baik dan mudah dipahami. Gunakan markdown (bold, code block, list, header) untuk memperjelas.';
+  return p;
+}
+
+// ─── FILE ───
+async function handleFile(input) {
+  const file = input.files[0]; if(!file) return;
+  if(file.size > 5*1024*1024){alert('Maks 5MB');return;}
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileTag').style.display = 'flex';
+  if(file.type.startsWith('image/')) {
+    const b64 = await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
+    attachedFile = {name:file.name,content:b64,type:'image',mime:file.type};
+  } else {
+    const text = await file.text();
+    attachedFile = {name:file.name,content:text.slice(0,6000),type:'text'};
+  }
+  input.value='';
+}
+function removeFile(){attachedFile={};document.getElementById('fileTag').style.display='none';}
+
+// ─── SEND ───
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,150)+'px';}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function sendQuick(t){document.getElementById('userInput').value=t;sendMessage();}
+function clearChat(){if(!confirm('Hapus semua riwayat chat?'))return;history=[];const m=document.getElementById('messages');m.innerHTML='<div class="welcome" id="welcome"><div class="welcome-icon">🗑️</div><h2>Chat <span>Dihapus</span></h2><p>Mulai sesi baru kapan saja!</p></div>';}
+
+async function sendMessage() {
+  if(isLoading) return;
+  const inp = document.getElementById('userInput');
+  const text = inp.value.trim();
+  if(!text && !attachedFile.name) return;
+  inp.value=''; inp.style.height='auto';
+  isLoading=true; document.getElementById('sendBtn').disabled=true;
+  const displayText = attachedFile.name ? `📎 ${attachedFile.name}\n\n${text}` : text;
+  addMsg('user', displayText);
+  document.getElementById('welcome')?.remove();
+  addThinking();
+  let userContent;
+  if(attachedFile.type==='image') {
+    userContent=[{type:'image',source:{type:'base64',media_type:attachedFile.mime,data:attachedFile.content}},{type:'text',text:text||'Tolong analisis gambar ini.'}];
+  } else if(attachedFile.type==='text') {
+    userContent=`[File: ${attachedFile.name}]\n\n${attachedFile.content}\n\n---\n${text}`;
+  } else { userContent=text; }
+  history.push({role:'user',content:userContent});
+  removeFile();
+  try {
+  const headers = {'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`};
+  // Build messages array with system prompt
+  const groqMessages = [{role:'system',content:getSystemPrompt()}, ...history];
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers,body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1000,messages:groqMessages})});
+    const data = await res.json();
+    removeThinking();
+    if(data.error) {
+      const errMsg = data.error.message || JSON.stringify(data.error);
+      addMsg('ai', `⚠️ Error dari API: ${errMsg}`);
+      history.pop();
+    } else {
+      const reply = data.choices?.[0]?.message?.content || 'Respons kosong dari server.';
+      addMsg('ai', reply);
+      history.push({role:'assistant',content:reply});
+    }
+  } catch(e) {
+    removeThinking();
+    addMsg('ai',`⚠️ Gagal terhubung: ${e.message}`);
+    history.pop();
+  }
+  isLoading=false; document.getElementById('sendBtn').disabled=false; inp.focus();
+}
+
+function addMsg(role, content) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div'); div.className=`msg ${role}`;
+  const av = document.createElement('div'); av.className='msg-av'; av.textContent=role==='user'?'👤':'🤖';
+  const bubble = document.createElement('div'); bubble.className='msg-bubble'; bubble.innerHTML=fmt(content);
+  setTimeout(()=>{
+    bubble.querySelectorAll('pre').forEach(pre=>{
+      const btn=document.createElement('button'); btn.className='copy-btn'; btn.textContent='Salin';
+      btn.onclick=()=>{navigator.clipboard.writeText(pre.querySelector('code')?.innerText||pre.innerText);btn.textContent='✓ Tersalin';setTimeout(()=>btn.textContent='Salin',2000);};
+      pre.insertBefore(btn,pre.firstChild);
+    });
+  },0);
+  div.appendChild(av); div.appendChild(bubble); msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function fmt(t) {
+  t=t.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre><code>${esc(c.trim())}</code></pre>`);
+  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
+  t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\*(.+?)\*/g,'<em style="color:var(--accent3);font-style:normal">$1</em>');
+  t=t.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  t=t.replace(/^## (.+)$/gm,'<h3>$1</h3>');
+  t=t.replace(/^- (.+)$/gm,'<li>$1</li>');
+  t=t.replace(/(<li>[\s\S]*?<\/li>\n?)+/g,m=>`<ul>${m}</ul>`);
+  t=t.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  t=t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+  return `<p>${t}</p>`;
+}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function addThinking(){
+  const msgs=document.getElementById('messages');
+  const div=document.createElement('div'); div.className='msg ai'; div.id='thinking';
+  const av=document.createElement('div'); av.className='msg-av'; av.textContent='🤖';
+  const t=document.createElement('div'); t.className='thinking';
+  t.innerHTML='<span>Sedang berpikir</span><div class="dots"><span></span><span></span><span></span></div>';
+  div.appendChild(av); div.appendChild(t); msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight;
+}
+function removeThinking(){document.getElementById('thinking')?.remove();}
+
+// ─── DEADLINE ───
+function openModal(){document.getElementById('modalOverlay').classList.add('open');}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function saveDeadline(){
+  const name=document.getElementById('dlName').value.trim();
+  const sub=document.getElementById('dlSubject').value.trim();
+  const date=document.getElementById('dlDate').value;
+  if(!name||!date){alert('Isi nama tugas dan tanggal!');return;}
+  deadlines.push({id:Date.now(),name,subject:sub,date,done:false});
+  deadlines.sort((a,b)=>a.date.localeCompare(b.date));
+  document.getElementById('dlName').value=''; document.getElementById('dlSubject').value='';
+  closeModal(); renderDeadlines(); updateBadge();
+}
+function toggleDone(id){const d=deadlines.find(x=>x.id===id);if(d)d.done=!d.done;renderDeadlines();updateBadge();}
+function delDeadline(id){deadlines=deadlines.filter(x=>x.id!==id);renderDeadlines();updateBadge();}
+function daysLeft(ds){const t=new Date();t.setHours(0,0,0,0);const d=new Date(ds);d.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
+function renderDeadlines(){
+  const body=document.getElementById('dlBody');
+  if(!deadlines.length){body.innerHTML='<div class="dl-empty"><div class="em-icon">🗓️</div><p>Belum ada deadline.<br>Tambahkan agar tidak terlewat!</p></div>';return;}
+  body.innerHTML='<div class="dl-list">'+deadlines.map(dl=>{
+    const days=daysLeft(dl.date);
+    const st=dl.done?'done':days<0?'urgent':days<=3?'urgent':days<=7?'soon':'ok';
+    const dLabel=dl.done?'Selesai ✓':days<0?`${Math.abs(days)} hari lalu`:days===0?'Hari ini!':days===1?'Besok!':`${days} hari lagi`;
+    const dCls=!dl.done&&days<=3?'urgent':!dl.done&&days<=7?'soon':'';
+    const df=new Date(dl.date).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+    return `<div class="dl-card ${st}">
+      <div class="dl-dot ${st}"></div>
+      <div class="dl-info">
+        <div class="dl-name" style="${dl.done?'text-decoration:line-through':''}">${dl.name}</div>
+        <div class="dl-meta">
+          ${dl.subject?`<span class="dl-subject">${dl.subject}</span>`:''}
+          <span>${df}</span>
+          <span class="dl-days ${dCls}">${dLabel}</span>
+        </div>
+      </div>
+      <div class="dl-actions">
+        <button class="dl-chk" onclick="toggleDone(${dl.id})" title="${dl.done?'Belum selesai':'Selesai'}">${dl.done?'↩':'✓'}</button>
+        <button class="dl-del" onclick="delDeadline(${dl.id})" title="Hapus">✕</button>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+function updateBadge(){
+  const n=deadlines.filter(d=>!d.done).length;
+  const b=document.getElementById('dlBadge');
+  b.style.display=n?'block':'none'; b.textContent=n;
+  const mb=document.getElementById('mnavDlBadge');
+  if(mb){mb.style.display=n?'block':'none'; mb.textContent=n;}
+  localStorage.setItem('studyai_deadlines',JSON.stringify(deadlines));
+}
+
+// ─── QUIZ ───
+function renderQuizTopics(){
+  document.getElementById('quizTopics').innerHTML=QUIZ_TOPICS.map(t=>
+    `<button class="qo-btn" onclick="pickTopic('${t.label}',this)">
+      <div class="qo-icon">${t.icon}</div><div class="qo-label">${t.label}</div>
+    </button>`).join('');
+}
+function pickTopic(t,el){
+  quizTopic=t;
+  document.querySelectorAll('.qo-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  // Clear custom input when a preset topic is selected
+  document.getElementById('quizCustomInput').value='';
+  document.getElementById('quizCustomInput').classList.remove('has-value');
+  document.getElementById('quizCustomClear').style.display='none';
+  document.getElementById('startBtn').disabled=false;
+}
+function handleCustomTopic(val, fromEnter){
+  const trimmed = val.trim();
+  if(trimmed.length > 0){
+    quizTopic = trimmed;
+    // Deselect preset topic buttons
+    document.querySelectorAll('.qo-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById('quizCustomInput').classList.add('has-value');
+    document.getElementById('quizCustomClear').style.display='block';
+    document.getElementById('startBtn').disabled=false;
+    if(fromEnter) startQuiz();
+  } else {
+    document.getElementById('quizCustomInput').classList.remove('has-value');
+    document.getElementById('quizCustomClear').style.display='none';
+    // Only disable if no preset selected
+    if(!document.querySelector('.qo-btn.selected')) {
+      quizTopic='';
+      document.getElementById('startBtn').disabled=true;
+    }
+  }
+}
+function clearCustomTopic(){
+  document.getElementById('quizCustomInput').value='';
+  document.getElementById('quizCustomInput').classList.remove('has-value');
+  document.getElementById('quizCustomClear').style.display='none';
+  if(!document.querySelector('.qo-btn.selected')){
+    quizTopic='';
+    document.getElementById('startBtn').disabled=true;
+  }
+  document.getElementById('quizCustomInput').focus();
+}
+function pickNum(n,el){
+  quizNum=n;
+  document.querySelectorAll('.qnum-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+async function startQuiz(){
+  if(!quizTopic) return;
+
+  // Cek API key dulu
+  if(!API_KEY) {
+    alert('API key belum diisi! Tap "Key Aktif" di header untuk mengatur API key.');
+    return;
+  }
+
+  document.getElementById('quizSetup').style.display='none';
+  document.getElementById('quizLoading').style.display='flex';
+  try {
+    const qHeaders = {'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`};
+    const sysPrompt = `Kamu pembuat soal kuis untuk mahasiswa Teknik Informatika. Buat ${quizNum} soal pilihan ganda tentang "${quizTopic}". Balas HANYA dengan JSON valid, tanpa teks lain, tanpa markdown, tanpa komentar. Format wajib: {"questions":[{"question":"...","choices":["A. ...","B. ...","C. ...","D. ..."],"answer":0,"explanation":"..."}]}. answer adalah index 0-3 dari jawaban benar.`;
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:qHeaders,body:JSON.stringify({
+      model:'llama-3.3-70b-versatile', max_tokens:2000,
+      temperature:0.3,
+      messages:[{role:'system',content:sysPrompt},{role:'user',content:`Buat ${quizNum} soal pilihan ganda tentang ${quizTopic} untuk mahasiswa Teknik Informatika. Balas HANYA JSON.`}]
+    })});
+    const data=await res.json();
+    if(data.error) throw new Error(`API Error: ${data.error.message}`);
+    const raw=(data.choices?.[0]?.message?.content||'').replace(/```json|```/g,'').trim();
+    if(!raw) throw new Error('Respons AI kosong');
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch(pe) {
+      // Coba cari JSON di dalam respons
+      const match = raw.match(/\{[\s\S]*\}/);
+      if(match) parsed = JSON.parse(match[0]);
+      else throw new Error('Format JSON tidak valid dari AI');
+    }
+    quizQs = parsed.questions || [];
+    if(quizQs.length === 0) throw new Error('Soal tidak ditemukan dalam respons');
+    quizIdx=0; quizScore=0; quizAnswered=false;
+    document.getElementById('quizLoading').style.display='none';
+    document.getElementById('quizResult').classList.remove('on');
+    document.getElementById('quizRunning').classList.add('on');
+    renderQ();
+  } catch(e) {
+    document.getElementById('quizLoading').style.display='none';
+    document.getElementById('quizSetup').style.display='flex';
+    alert(`Gagal membuat soal:\n${e.message}\n\nPastikan API key Groq aktif dan ada koneksi internet.`);
+  }
+}
+function renderQ(){
+  const q=quizQs[quizIdx]; if(!q) return;
+  quizAnswered=false;
+  const total=quizQs.length, pct=(quizIdx/total)*100;
+  document.getElementById('qProg').textContent=`Soal ${quizIdx+1} / ${total}`;
+  document.getElementById('qScoreLive').textContent=`Skor: ${quizScore}`;
+  document.getElementById('qFill').style.width=pct+'%';
+  document.getElementById('qNum').textContent=`SOAL ${String(quizIdx+1).padStart(2,'0')}`;
+  document.getElementById('qText').textContent=q.question;
+  document.getElementById('qChoices').innerHTML=q.choices.map((c,i)=>
+    `<button class="q-choice" onclick="answerQ(${i})" id="ch${i}">
+      <span class="ch-letter">${'ABCD'[i]}</span>${c.replace(/^[A-D]\.\s*/,'')}
+    </button>`).join('');
+  document.getElementById('qExp').classList.remove('show');
+  document.getElementById('nextBtn').classList.remove('show');
+}
+function answerQ(idx){
+  if(quizAnswered) return; quizAnswered=true;
+  const q=quizQs[quizIdx], correct=q.answer;
+  document.querySelectorAll('.q-choice').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===correct) b.classList.add('correct');
+    else if(i===idx&&idx!==correct) b.classList.add('wrong');
+  });
+  if(idx===correct) quizScore++;
+  document.getElementById('qScoreLive').textContent=`Skor: ${quizScore}`;
+  const expEl=document.getElementById('qExp');
+  expEl.innerHTML=`<strong>${idx===correct?'✅ Benar!':'❌ Salah.'}</strong> ${q.explanation}`;
+  expEl.classList.add('show');
+  const nb=document.getElementById('nextBtn');
+  nb.classList.add('show');
+  nb.textContent=quizIdx+1>=quizQs.length?'Lihat Hasil →':'Soal Berikutnya →';
+}
+function nextQ(){
+  quizIdx++;
+  if(quizIdx>=quizQs.length) showResult();
+  else renderQ();
+}
+function showResult(){
+  document.getElementById('quizRunning').classList.remove('on');
+  const total=quizQs.length, pct=Math.round(quizScore/total*100);
+  document.getElementById('resultRing').style.setProperty('--pct',pct+'%');
+  document.getElementById('resultScore').textContent=`${quizScore}/${total}`;
+  const grade=pct>=80?'🎉 Excellent!':pct>=60?'👍 Cukup Bagus':'📚 Ayo Belajar Lagi!';
+  document.getElementById('resultSub').textContent=`${pct}% benar · ${grade}`;
+  document.getElementById('quizResult').classList.add('on');
+}
+function resetQuiz(){
+  document.getElementById('quizResult').classList.remove('on');
+  document.getElementById('quizRunning').classList.remove('on');
+  document.getElementById('quizSetup').style.display='flex';
+  quizTopic='';
+  document.querySelectorAll('.qo-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('quizCustomInput').value='';
+  document.getElementById('quizCustomInput').classList.remove('has-value');
+  document.getElementById('quizCustomClear').style.display='none';
+  document.getElementById('startBtn').disabled=true;
+}
+
+// ─── MOBILE NAV ───
+function mobileNav(v) {
+  switchView(v);
+  document.querySelectorAll('.mnav-item').forEach(b => b.classList.remove('active'));
+  const map = {chat:'mnav-chat', quiz:'mnav-quiz', deadline:'mnav-deadline'};
+  if(map[v]) document.getElementById(map[v])?.classList.add('active');
+  closeModeDrawer();
+}
+
+function toggleModeDrawer() {
+  const drawer = document.getElementById('modeDrawer');
+  if(drawer.classList.contains('open')) { closeModeDrawer(); }
+  else { renderDrawerMatkul(); drawer.classList.add('open'); }
+}
+
+function closeModeDrawer() {
+  document.getElementById('modeDrawer').classList.remove('open');
+}
+
+function setModeDrawer(m, el) {
+  mode = m;
+  document.querySelectorAll('.drawer-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const placeholders = {
+    tanya:'Tanya apa saja tentang materi kuliah...',
+    latihan:'Minta soal latihan, misal: "Buatkan 5 soal tentang rekursi"...',
+    debug:'Paste kode yang error di sini untuk di-debug...',
+    rangkum:'Paste materi atau teks yang ingin dirangkum...',
+    ide:'Ceritakan topik diskusi atau tugasmu, saya bantu brainstorm...',
+  };
+  document.getElementById('userInput').placeholder = placeholders[m] || 'Ketik pesan...';
+  const labels = {tanya:'💬 Tanya Jawab', latihan:'📝 Latihan Soal', debug:'🐛 Debug Kode', rangkum:'📖 Rangkum Materi', ide:'💡 Ide & Diskusi'};
+  document.querySelector('.mode-badge').innerHTML = `<div class="mode-dot"></div>${labels[m]}`;
+  setTimeout(() => { mobileNav('chat'); document.getElementById('userInput').focus(); }, 200);
+}
+
+function renderDrawerMatkul() {
+  const sem = document.getElementById('semSelect').value;
+  const courses = SEMESTERS[sem] || SEMESTERS[''];
+  document.getElementById('drawerMatkul').innerHTML = courses.map(c =>
+    `<span class="drawer-matkul-pill ${subject===c?'active':''}" onclick="pickSubjectDrawer('${c}',this)">${c}</span>`
+  ).join('');
+}
+
+function pickSubjectDrawer(s, el) {
+  subject = s;
+  document.querySelectorAll('.drawer-matkul-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('userInput').placeholder = `Tanya tentang ${s}...`;
+  setTimeout(() => { mobileNav('chat'); document.getElementById('userInput').focus(); }, 200);
+}
+
+init();
+
+// ─── PWA SETUP ───
+(function(){
+  // Inject manifest
+  const manifest = {
+    name: 'StudyAI — Teknik Informatika',
+    short_name: 'StudyAI TI',
+    description: 'Asisten belajar AI untuk mahasiswa Teknik Informatika',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#080810',
+    theme_color: '#080810',
+    orientation: 'portrait',
+    icons: [
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23080810'/><rect x='16' y='16' width='160' height='160' rx='30' fill='%2300e5ff' opacity='.15'/><text y='130' x='30' font-size='120'>🎓</text></svg>", sizes: '192x192', type: 'image/svg+xml' },
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23080810'/><rect x='40' y='40' width='432' height='432' rx='80' fill='%2300e5ff' opacity='.15'/><text y='370' x='60' font-size='320'>🎓</text></svg>", sizes: '512x512', type: 'image/svg+xml', purpose: 'maskable' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  document.getElementById('manifest-placeholder').href = url;
+
+  // Register service worker inline
+  if('serviceWorker' in navigator) {
+    const swCode = `
+const CACHE = 'studyai-ti-v1';
+const ASSETS = [self.location.href];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  if(e.request.url.includes('api.groq.com') || e.request.url.includes('fonts.googleapis.com')) return;
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(()=>caches.match(e.request))));
+});
+    `;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).catch(()=>{});
+  }
+})();
+</script>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <button class="mnav-item active" id="mnav-chat" onclick="mobileNav('chat')">
+    <span class="mnav-icon">💬</span>Chat
+  </button>
+  <button class="mnav-item" id="mnav-mode" onclick="toggleModeDrawer()">
+    <span class="mnav-icon">⚙️</span>Mode
+  </button>
+  <button class="mnav-item" id="mnav-quiz" onclick="mobileNav('quiz')">
+    <span class="mnav-icon">🎯</span>Kuis
+  </button>
+  <button class="mnav-item" id="mnav-deadline" onclick="mobileNav('deadline')">
+    <span class="mnav-icon">📅</span>Deadline
+    <span class="mnav-dl-badge" id="mnavDlBadge" style="display:none">0</span>
+  </button>
+</nav>
+
+<!-- MODE FLOATING MENU (mobile) -->
+<div class="mode-drawer" id="modeDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-title">Mode Belajar</div>
+  <div class="drawer-grid">
+    <button class="drawer-btn active" id="dbtn-tanya" onclick="setModeDrawer('tanya',this)">💬 Tanya Jawab</button>
+    <button class="drawer-btn" id="dbtn-latihan" onclick="setModeDrawer('latihan',this)">📝 Latihan Soal</button>
+    <button class="drawer-btn" id="dbtn-debug" onclick="setModeDrawer('debug',this)">🐛 Debug Kode</button>
+    <button class="drawer-btn" id="dbtn-rangkum" onclick="setModeDrawer('rangkum',this)">📖 Rangkum Materi</button>
+    <button class="drawer-btn" id="dbtn-ide" onclick="setModeDrawer('ide',this)" style="grid-column:span 2">💡 Ide & Diskusi</button>
+  </div>
+  <div class="drawer-matkul-label">Mata Kuliah</div>
+  <div class="drawer-matkul" id="drawerMatkul"></div>
+</div>
+
+</body>
+</html>
