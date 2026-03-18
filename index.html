@@ -411,8 +411,8 @@ header{position:relative;z-index:20;display:flex;align-items:center;justify-cont
 </head>
 <body>
 
-<!-- API KEY SCREEN -->
-<div class="apikey-screen" id="apikeyScreen">
+<!-- API KEY SCREEN - disabled -->
+<div class="apikey-screen" id="apikeyScreen" style="display:none!important">
   <div class="apikey-box">
     <div class="apikey-logo">
       <div class="apikey-logo-icon">TI</div>
@@ -454,10 +454,7 @@ header{position:relative;z-index:20;display:flex;align-items:center;justify-cont
   </select>
   <div class="header-right">
     <button class="hbtn" onclick="clearChat()"><span class="hbtn-icon">🗑</span><span class="hbtn-text"> Hapus Chat</span></button>
-    <div class="key-indicator" onclick="changeApiKey()" title="Ganti API Key">
-      <div class="key-dot"></div><span class="hbtn-text">Key Aktif</span>
-    </div>
-    <div class="mode-badge hide-mobile"><div class="mode-dot"></div>Online</div>
+    <div class="hide-mobile" style="display:none"></div>
   </div>
 </header>
 
@@ -662,7 +659,7 @@ let API_KEY = '';
 // ─── INIT ───
 function init() {
 // Load API key
-  API_KEY = localStorage.getItem('studyai_groqkey') || '';
+  API_KEY = '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';
   // Jika dibuka di dalam Claude (tidak perlu API key), sembunyikan setup screen
   const insideClaude = window.location.hostname === '' || window.location.protocol === 'blob:' || document.referrer.includes('claude.ai') || window.parent !== window;
   if(API_KEY || insideClaude) {
@@ -1014,7 +1011,7 @@ async function startQuiz(){
   if(!quizTopic) return;
 
   // Cek API key dulu
-  if(!API_KEY) {
+  if(false) {
     alert('API key belum diisi! Tap "Key Aktif" di header untuk mengatur API key.');
     return;
   }
@@ -1167,9 +1164,8 @@ function pickSubjectDrawer(s, el) {
 
 init();
 
-// ─── PWA SETUP ───
+// ─── PWA MANIFEST ───
 (function(){
-  // Inject manifest
   const manifest = {
     name: 'StudyAI — Teknik Informatika',
     short_name: 'StudyAI TI',
@@ -1180,34 +1176,14 @@ init();
     theme_color: '#080810',
     orientation: 'portrait',
     icons: [
-      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23080810'/><rect x='16' y='16' width='160' height='160' rx='30' fill='%2300e5ff' opacity='.15'/><text y='130' x='30' font-size='120'>🎓</text></svg>", sizes: '192x192', type: 'image/svg+xml' },
-      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23080810'/><rect x='40' y='40' width='432' height='432' rx='80' fill='%2300e5ff' opacity='.15'/><text y='370' x='60' font-size='320'>🎓</text></svg>", sizes: '512x512', type: 'image/svg+xml', purpose: 'maskable' }
+      { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23080810'/%3E%3Ctext y='140' x='24' font-size='130'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E", sizes: '192x192', type: 'image/svg+xml' },
+      { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23080810'/%3E%3Ctext y='390' x='56' font-size='360'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E", sizes: '512x512', type: 'image/svg+xml', purpose: 'maskable' }
     ]
   };
-  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  document.getElementById('manifest-placeholder').href = url;
-
-  // Register service worker inline
-  if('serviceWorker' in navigator) {
-    const swCode = `
-const CACHE = 'studyai-ti-v1';
-const ASSETS = [self.location.href];
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
-});
-self.addEventListener('fetch', e => {
-  if(e.request.url.includes('api.groq.com') || e.request.url.includes('fonts.googleapis.com')) return;
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(()=>caches.match(e.request))));
-});
-    `;
-    const swBlob = new Blob([swCode], {type:'application/javascript'});
-    const swUrl = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl).catch(()=>{});
-  }
+  try {
+    const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+    document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
+  } catch(e) {}
 })();
 </script>
 
