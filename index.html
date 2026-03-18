@@ -692,12 +692,11 @@ function saveApiKey(){
   localStorage.setItem('studyai_groqkey', key);
   document.getElementById('apikeyScreen').style.display='none';
 }
-function changeApiKey(){
-  if(!confirm('Ganti API Key? Kamu perlu memasukkan key baru.')) return;
-  document.getElementById('apikeyInput').value='';
-  document.getElementById('apikeySaveBtn').disabled=true;
-  document.getElementById('apikeyScreen').style.display='flex';
-}
+// API key functions disabled - key is embedded
+function changeApiKey(){}
+function saveApiKey(){}
+function checkKey(){}
+function toggleKeyVis(){}
 
 // ─── QUICK PROMPTS POOL ───
 const PROMPT_POOL = [
